@@ -6,9 +6,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	deployer "github.com/bruno-anjos/deployer/api"
+	genericutils "github.com/bruno-anjos/solution-utils"
 	"github.com/bruno-anjos/solution-utils/http_utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -87,7 +89,8 @@ func addDeployment(deploymentName, filename string, static bool) {
 		DeploymentYAMLBytes: fileBytes,
 	}
 
-	req := http_utils.BuildRequest(http.MethodPost, deployer.DefaultHostPort, deployer.GetDeploymentsPath(), deployment)
+	req := http_utils.BuildRequest(http.MethodPost, genericutils.LocalhostAddr + ":" + strconv.Itoa(deployer.Port),
+		deployer.GetDeploymentsPath(), deployment)
 	status, _ := http_utils.DoRequest(httpClient, req, nil)
 
 	if status != http.StatusOK {

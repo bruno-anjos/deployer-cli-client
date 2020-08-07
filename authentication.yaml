@@ -35,7 +35,7 @@ spec:
             - name: MONGODB_URL
               value: "mongodb://novapokemon-usersdb:27017"
             - name: TRAINERS_URL
-              value: "trainers-service:8009"
+              value: "trainers:8009"
           envFrom:
             - configMapRef:
                 name: {{$.Values.global.api_configmap.name}}

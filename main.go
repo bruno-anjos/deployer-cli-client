@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -60,11 +59,16 @@ func main() {
 				},
 			},
 			{
-				Name:    "delete",
+				Name:    "del",
 				Aliases: []string{"d"},
 				Usage:   "delete a deployment",
 				Action: func(c *cli.Context) error {
-					fmt.Println("deleted deployment: ", c.Args().First())
+					if c.Args().Len() != 1 {
+						log.Fatal("del: deployment_name")
+					}
+
+					deleteDeployment(c.Args().First())
+
 					return nil
 				},
 			},
@@ -91,6 +95,16 @@ func addDeployment(deploymentName, filename string, static bool) {
 
 	req := http_utils.BuildRequest(http.MethodPost, genericutils.LocalhostAddr + ":" + strconv.Itoa(deployer.Port),
 		deployer.GetDeploymentsPath(), deployment)
+	status, _ := http_utils.DoRequest(httpClient, req, nil)
+
+	if status != http.StatusOK {
+		log.Fatalf("got status %d from deployer", status)
+	}
+}
+
+func deleteDeployment(deploymentName string) {
+	req := http_utils.BuildRequest(http.MethodDelete, genericutils.LocalhostAddr + ":" + strconv.Itoa(deployer.Port),
+		deployer.GetDeploymentPath(deploymentName), nil)
 	status, _ := http_utils.DoRequest(httpClient, req, nil)
 
 	if status != http.StatusOK {

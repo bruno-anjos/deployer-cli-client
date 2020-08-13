@@ -56,6 +56,19 @@ func main() {
 							return nil
 						},
 					},
+					{
+						Name:  "node",
+						Usage: "add a new node",
+						Action: func(c *cli.Context) error {
+							if c.Args().Len() != 1 {
+								log.Fatal("add node: node_addr")
+							}
+
+							addNode(c.Args().First())
+
+							return nil
+						},
+					},
 				},
 			},
 			{
@@ -81,6 +94,16 @@ func main() {
 	}
 }
 
+func addNode(addr string) {
+	req := http_utils.BuildRequest(http.MethodPost, genericutils.LocalhostAddr+":"+strconv.Itoa(deployer.Port),
+		deployer.GetAddNodePath(), addr)
+	status, _ := http_utils.DoRequest(httpClient, req, nil)
+
+	if status != http.StatusOK {
+		log.Fatalf("got status code %d while adding node to deployer", status)
+	}
+}
+
 func addDeployment(deploymentName, filename string, static bool) {
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -93,7 +116,7 @@ func addDeployment(deploymentName, filename string, static bool) {
 		DeploymentYAMLBytes: fileBytes,
 	}
 
-	req := http_utils.BuildRequest(http.MethodPost, genericutils.LocalhostAddr + ":" + strconv.Itoa(deployer.Port),
+	req := http_utils.BuildRequest(http.MethodPost, genericutils.LocalhostAddr+":"+strconv.Itoa(deployer.Port),
 		deployer.GetDeploymentsPath(), deployment)
 	status, _ := http_utils.DoRequest(httpClient, req, nil)
 
@@ -103,7 +126,7 @@ func addDeployment(deploymentName, filename string, static bool) {
 }
 
 func deleteDeployment(deploymentName string) {
-	req := http_utils.BuildRequest(http.MethodDelete, genericutils.LocalhostAddr + ":" + strconv.Itoa(deployer.Port),
+	req := http_utils.BuildRequest(http.MethodDelete, genericutils.LocalhostAddr+":"+strconv.Itoa(deployer.Port),
 		deployer.GetDeploymentPath(deploymentName), nil)
 	status, _ := http_utils.DoRequest(httpClient, req, nil)
 

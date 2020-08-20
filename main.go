@@ -104,14 +104,14 @@ func addNode(addr string) {
 	}
 }
 
-func addDeployment(deploymentName, filename string, static bool) {
+func addDeployment(deploymentId, filename string, static bool) {
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("error reading file: ", err)
 	}
 
 	deployment := deployer.DeploymentDTO{
-		DeploymentName:      deploymentName,
+		DeploymentId:        deploymentId,
 		Static:              static,
 		DeploymentYAMLBytes: fileBytes,
 	}
@@ -125,9 +125,9 @@ func addDeployment(deploymentName, filename string, static bool) {
 	}
 }
 
-func deleteDeployment(deploymentName string) {
+func deleteDeployment(deploymentId string) {
 	req := http_utils.BuildRequest(http.MethodDelete, genericutils.LocalhostAddr+":"+strconv.Itoa(deployer.Port),
-		deployer.GetDeploymentPath(deploymentName), nil)
+		deployer.GetDeploymentPath(deploymentId), nil)
 	status, _ := http_utils.DoRequest(httpClient, req, nil)
 
 	if status != http.StatusOK {
